@@ -2,6 +2,8 @@
 
 > Always loaded. Keep it short. Setup and infrastructure details live in `docs/SETUP.md`.
 
+@AGENTS.md
+
 ## IDENTITY
 
 **Shiroi Energy LLP**: solar EPC, Chennai, Tamil Nadu. Rooftop solar (residential, commercial, industrial).
@@ -37,11 +39,25 @@ No secret is needed in the session: the connectors use the user's own logins, an
 4. Run `list_migrations` and save the **exact same SQL** as `supabase/migrations/<version>_<name>.sql`, using the
    version it returned. The file and the DB must match, or the `Database` GitHub workflow will see drift.
 5. Run `get_advisors` (security + performance) and fix anything it flags.
-6. Regenerate types with `generate_typescript_types` → `types/database.ts` (never edit by hand). Commit together with the migration.
+6. Regenerate types with `generate_typescript_types` → `src/types/database.ts` (never edit by hand). Commit together with the migration.
 7. Take a backup before destructive changes (free plan has no backups). While the DB holds only dummy data,
    apply-then-merge is fine. Once real data exists, migrations go through PR review first.
 
 Dummy data: put it in `supabase/seed.sql` (idempotent: `ON CONFLICT DO NOTHING`) and load it with `execute_sql`.
+
+## APP (Next.js 16, App Router, single app at repo root)
+
+- Stack: Next.js 16.4 + React 19 + TypeScript + Tailwind 4, npm. **Next 16 differs from older docs**: read
+  `node_modules/next/dist/docs/` before using an unfamiliar API (see AGENTS.md).
+  - `middleware.ts` is now `proxy.ts` (export `proxy`, Node runtime only).
+  - `cacheComponents` is ON: anything reading cookies/headers or doing an uncached fetch must sit inside `<Suspense>`
+    (use `await connection()` for per-request work); otherwise the build fails.
+- Supabase clients: `src/lib/supabase/{client,server,admin}.ts`. Env access via `src/lib/env.ts`.
+- Layout: `src/app/` routes, `src/lib/<domain>/<domain>-queries.ts` / `-actions.ts`, `src/types/database.ts`.
+- Brand tokens (Solar Gold) are Tailwind theme colours in `src/app/globals.css`.
+- Before every push: `npm run lint && npm run build` must pass.
+- Running the app **inside a cloud session**: `NODE_USE_ENV_PROXY=1 npx next start` (or `next dev`). The container
+  only reaches the internet through a proxy that Node ignores without this flag. Not needed on Vercel.
 
 ## GIT
 

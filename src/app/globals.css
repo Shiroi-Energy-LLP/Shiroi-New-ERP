@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* Shiroi "Solar Gold" tokens (from ERP1 docs/design/design-system.md). */
+@theme {
+  --color-brand: #e08a00;
+  --color-brand-hover: #c77606;
+  --color-brand-dark: #b45309; /* text/links on light surfaces (AA) */
+  --color-brand-night: #1f1709; /* ink on gold fills */
+  --color-cream: #fbf8f2; /* page background */
+  --color-sand: #e7dfd0; /* borders */
+  --color-ink: #1f1709;
+  --color-muted: #5b5446;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
