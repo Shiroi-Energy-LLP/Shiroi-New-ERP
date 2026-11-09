@@ -1,0 +1,15 @@
+-- =====================================================================
+-- DUMMY DATA ONLY. This repo is PUBLIC.
+-- Never put real customers, phone numbers, addresses, prices, salaries
+-- or employee details in this file.
+--
+-- Loaded only when you run the "Database" workflow manually with
+-- "Load seed data" ticked (GitHub -> Actions -> Database -> Run workflow).
+-- Seed files are tracked by hash: re-running applies this file again only
+-- if it changed, so write inserts to be idempotent (ON CONFLICT DO NOTHING).
+-- =====================================================================
+
+-- Example (add once the tables exist in supabase/migrations/):
+-- insert into customers (id, name, city) values
+--   ('00000000-0000-0000-0000-000000000001', 'Test Customer A', 'Chennai')
+-- on conflict (id) do nothing;

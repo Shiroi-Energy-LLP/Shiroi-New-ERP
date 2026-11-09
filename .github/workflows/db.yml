@@ -1,0 +1,63 @@
+# Applies supabase/migrations/*.sql to the shiroi-erp2 database.
+# Needs one repo secret: SUPABASE_DB_URL = the Session pooler (port 5432)
+# connection string from the private handover doc.
+#
+#   Pull request touching supabase/  -> dry run (shows what WOULD apply)
+#   Push to main touching supabase/  -> applies new migrations
+#   Manual run (Actions tab)         -> applies migrations, optional dummy seed
+name: Database
+
+on:
+  pull_request:
+    paths: ["supabase/migrations/**", "supabase/seed.sql"]
+  push:
+    branches: [main]
+    paths: ["supabase/migrations/**", "supabase/seed.sql"]
+  workflow_dispatch:
+    inputs:
+      include_seed:
+        description: "Load seed data (supabase/seed.sql, DUMMY data only)"
+        type: boolean
+        default: false
+      dry_run:
+        description: "Dry run (show what would apply, change nothing)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: database
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.122.1
+
+      - name: Check secret is set
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Repo secret SUPABASE_DB_URL is missing (Settings > Secrets and variables > Actions)."
+            exit 1
+          fi
+
+      - name: Push migrations
+        run: |
+          args=(db push --db-url "$SUPABASE_DB_URL" --yes)
+          if [ "${{ github.event_name }}" = "pull_request" ] || [ "${{ inputs.dry_run }}" = "true" ]; then
+            args+=(--dry-run)
+          fi
+          if [ "${{ inputs.include_seed }}" = "true" ]; then
+            args+=(--include-seed)
+          fi
+          supabase "${args[@]}"
