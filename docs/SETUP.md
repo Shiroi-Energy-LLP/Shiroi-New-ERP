@@ -8,7 +8,7 @@
 | Item | Value |
 |---|---|
 | Live URL | https://erp2.shiroienergy.com |
-| Hosting | Vercel project `shiroi-erp2`, functions in Mumbai (`bom1`) |
+| Hosting | Vercel project `shiroi-erp2` in Manivel's Vercel account (moves to a Shiroi team before go-live), functions in Mumbai (`bom1`) |
 | Production branch | `main` — every push auto-deploys. Other branches/PRs get preview URLs. |
 | Database | Supabase project `shiroi-erp2`, Postgres 17, Mumbai (`ap-south-1`), Free plan |
 | Supabase dashboard | https://supabase.com/dashboard/project/qrwoywmvdesvwsskxben |
@@ -21,34 +21,26 @@
 | Schema changes | `supabase/migrations/NNN_name.sql` | Yes |
 | Dummy/test data | `supabase/seed.sql` (fake data only) | Yes |
 | Runtime keys for the live site and previews | Vercel env vars (already set by Vivek) | No |
-| DB connection string for migrations | GitHub repo secret `SUPABASE_DB_URL` | No |
+| DB access for Claude | Supabase connector (your own login), no password needed | No |
+| Deploy access for Claude | Vercel connector (your own login) | No |
+| DB connection string for CI (optional, before go-live) | GitHub repo secret `SUPABASE_DB_URL` | No |
 | Keys for Claude Code cloud sessions | Claude cloud environment "Shiroi New ERP" settings | No |
 | Full handover doc (password, secret key) | Password manager / private vault | **Never** |
 | Real customer/price/salary data, imports | Supabase Storage, or gitignored `data/` on a laptop | **Never** |
 
 ## Working from a phone (primary workflow)
 
-Nothing runs on the phone itself. Claude Code cloud sessions edit the code, and GitHub, Vercel and Supabase run it:
+Nothing runs on the phone itself. Claude Code cloud sessions do the work through the **Supabase** and **Vercel** connectors,
+which use your own logins, so no password or secret key is stored in Claude or typed by you.
 
-1. **Change code or schema** in a Claude Code cloud session on this repo, on a branch, and open a PR.
-2. **See it running**: Vercel builds every branch/PR and posts a **preview URL** on the PR. Open it in the phone browser.
-   Previews use the same `shiroi-erp2` database.
-3. **Schema changes**: the PR runs the `Database` workflow as a **dry run**, so the PR checks show which migrations would apply.
-   Merging to `main` applies them for real. `main` also deploys to https://erp2.shiroienergy.com.
-4. **Dummy data**: GitHub → Actions → **Database** → Run workflow → tick *Load seed data*.
-   (GitHub mobile app or mobile browser.)
+1. **Code**: Claude works on a branch and opens a PR. Vercel posts a **preview URL**; open it on the phone.
+2. **Schema**: Claude applies migrations with the Supabase connector and saves the same SQL in
+   `supabase/migrations/<version>_<name>.sql` (rules in `CLAUDE.md`).
+3. **Dummy data**: `supabase/seed.sql`, loaded by Claude through the connector.
+4. **Go live**: merge the PR to `main` (GitHub app, or tell Claude "push to main").
 
-The cloud session container can't reach Postgres directly (HTTPS only), so migrations always go through the
-`Database` workflow, never `supabase db push` from a session.
-
-### One-time setup
-
-- **GitHub secret**: repo → Settings → Secrets and variables → Actions → New repository secret:
-  `SUPABASE_DB_URL` = the **Session pooler (port 5432)** string from the handover doc.
-  Repo admin rights are needed, so ask Vivek if Settings isn't visible.
-- **Claude cloud environment** (only to run the app/tests inside a session): environment menu in the session's title bar →
-  Edit. Allow host `qrwoywmvdesvwsskxben.supabase.co`, and add the `NEXT_PUBLIC_*` variables from `.env.example`.
-  Add `SUPABASE_SECRET_KEY` there yourself only when server-side admin code needs it. Never paste it into chat.
+The `Database` GitHub workflow skips itself until the `SUPABASE_DB_URL` repo secret exists. Before real data goes in,
+add that secret (Vivek, as repo admin) and make PR-reviewed migrations the only route.
 
 ## Laptop setup (optional)
 
@@ -65,7 +57,8 @@ The cloud session container can't reach Postgres directly (HTTPS only), so migra
 
 See `.env.example` for the full list. Vercel already has `NEXT_PUBLIC_SUPABASE_URL`,
 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `NEXT_PUBLIC_ERP_URL`.
-**Adding a new env var?** Send Vivek its name and value so it's added in Vercel, otherwise the deploy breaks.
+**Adding a new env var?** Add it in Vercel too (Settings → Environment Variables, or ask Claude to use the Vercel connector).
+Otherwise the deploy breaks. DNS (`CNAME erp2`) is at GoDaddy and owned by Vivek: send him any DNS change Vercel asks for.
 
 ## Supabase configuration
 
@@ -106,4 +99,4 @@ See `.env.example` for the full list. Vercel already has `NEXT_PUBLIC_SUPABASE_U
 ERP1 (https://github.com/Shiroi-Energy-LLP/shiroi-erp): `CLAUDE.md`, `docs/SHIROI_MASTER_REFERENCE.md`,
 `docs/modules/*.md`, `docs/design/design-system.md`, `packages/ui`.
 
-Contacts: Vivek — owner, approvals, Vercel, DNS, billing, GitHub org admin.
+Contacts: Vivek — owner, approvals, DNS (GoDaddy), billing, GitHub org admin. Manivel — Vercel project (for now).
