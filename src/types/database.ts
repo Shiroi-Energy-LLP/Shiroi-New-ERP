@@ -14,16 +14,256 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      lead_activities: {
+        Row: {
+          body: string | null
+          created_at: string
+          created_by: string | null
+          from_stage: Database["public"]["Enums"]["lead_stage"] | null
+          id: string
+          lead_id: string
+          to_stage: Database["public"]["Enums"]["lead_stage"] | null
+          type: Database["public"]["Enums"]["lead_activity_type"]
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          from_stage?: Database["public"]["Enums"]["lead_stage"] | null
+          id?: string
+          lead_id: string
+          to_stage?: Database["public"]["Enums"]["lead_stage"] | null
+          type: Database["public"]["Enums"]["lead_activity_type"]
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          created_by?: string | null
+          from_stage?: Database["public"]["Enums"]["lead_stage"] | null
+          id?: string
+          lead_id?: string
+          to_stage?: Database["public"]["Enums"]["lead_stage"] | null
+          type?: Database["public"]["Enums"]["lead_activity_type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          address: string | null
+          assigned_to: string | null
+          city: string | null
+          created_at: string
+          created_by: string | null
+          customer_name: string
+          division: Database["public"]["Enums"]["business_division"]
+          email: string | null
+          id: string
+          latitude: number | null
+          lead_number: number
+          load_requirement_kw: number | null
+          longitude: number | null
+          lost_at: string | null
+          lost_reason: string | null
+          monthly_eb_bill: number | null
+          next_follow_up_at: string | null
+          notes: string | null
+          phone: string | null
+          pincode: string | null
+          roof_type: Database["public"]["Enums"]["roof_type"] | null
+          site_visit_at: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          stage: Database["public"]["Enums"]["lead_stage"]
+          stage_changed_at: string
+          updated_at: string
+          won_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          assigned_to?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_name: string
+          division: Database["public"]["Enums"]["business_division"]
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          lead_number?: never
+          load_requirement_kw?: number | null
+          longitude?: number | null
+          lost_at?: string | null
+          lost_reason?: string | null
+          monthly_eb_bill?: number | null
+          next_follow_up_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          pincode?: string | null
+          roof_type?: Database["public"]["Enums"]["roof_type"] | null
+          site_visit_at?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          stage?: Database["public"]["Enums"]["lead_stage"]
+          stage_changed_at?: string
+          updated_at?: string
+          won_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          assigned_to?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string
+          division?: Database["public"]["Enums"]["business_division"]
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          lead_number?: never
+          load_requirement_kw?: number | null
+          longitude?: number | null
+          lost_at?: string | null
+          lost_reason?: string | null
+          monthly_eb_bill?: number | null
+          next_follow_up_at?: string | null
+          notes?: string | null
+          phone?: string | null
+          pincode?: string | null
+          roof_type?: Database["public"]["Enums"]["roof_type"] | null
+          site_visit_at?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          stage?: Database["public"]["Enums"]["lead_stage"]
+          stage_changed_at?: string
+          updated_at?: string
+          won_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          phone: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string
+          id: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          phone?: string | null
+          role?: Database["public"]["Enums"]["app_role"] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      crm_dashboard_summary: {
+        Args: { p_division: Database["public"]["Enums"]["business_division"] }
+        Returns: {
+          new_leads: number
+          open_leads: number
+          overdue_follow_ups: number
+          proposals_pending: number
+          todays_follow_ups: number
+          upcoming_site_visits: number
+          won_this_month: number
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "super_admin"
+        | "director"
+        | "sales_manager"
+        | "sales_engineer"
+        | "project_manager"
+        | "project_engineer"
+        | "purchase"
+        | "accounts"
+        | "hr"
+        | "store_manager"
+        | "technician"
+      business_division: "rooftop" | "ground_mount"
+      lead_activity_type:
+        | "created"
+        | "note"
+        | "call"
+        | "whatsapp"
+        | "email"
+        | "site_visit"
+        | "follow_up"
+        | "stage_change"
+      lead_source:
+        | "website"
+        | "manual"
+        | "whatsapp"
+        | "referral"
+        | "indiamart"
+        | "facebook"
+        | "google"
+      lead_stage:
+        | "new"
+        | "contacted"
+        | "site_visit"
+        | "proposal_sent"
+        | "negotiation"
+        | "won"
+        | "lost"
+      roof_type:
+        | "rcc"
+        | "metal_sheet"
+        | "tile"
+        | "asbestos"
+        | "open_land"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +390,57 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "super_admin",
+        "director",
+        "sales_manager",
+        "sales_engineer",
+        "project_manager",
+        "project_engineer",
+        "purchase",
+        "accounts",
+        "hr",
+        "store_manager",
+        "technician",
+      ],
+      business_division: ["rooftop", "ground_mount"],
+      lead_activity_type: [
+        "created",
+        "note",
+        "call",
+        "whatsapp",
+        "email",
+        "site_visit",
+        "follow_up",
+        "stage_change",
+      ],
+      lead_source: [
+        "website",
+        "manual",
+        "whatsapp",
+        "referral",
+        "indiamart",
+        "facebook",
+        "google",
+      ],
+      lead_stage: [
+        "new",
+        "contacted",
+        "site_visit",
+        "proposal_sent",
+        "negotiation",
+        "won",
+        "lost",
+      ],
+      roof_type: [
+        "rcc",
+        "metal_sheet",
+        "tile",
+        "asbestos",
+        "open_land",
+        "other",
+      ],
+    },
   },
 } as const
