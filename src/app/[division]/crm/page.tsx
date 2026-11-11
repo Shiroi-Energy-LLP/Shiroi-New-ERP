@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { io } from "next/cache";
 import { Plus, Search } from "lucide-react";
 import { parseDivision, type Division } from "@/lib/divisions";
 import { requireStaff } from "@/lib/auth/session";
@@ -49,6 +50,7 @@ export default async function CrmPage({ params, searchParams }: PageProps<"/[div
 
 async function LeadList({ division, filter, q, page }: { division: Division; filter: Filter; q: string; page: number }) {
   await requireStaff();
+  await io(); // reads the current time (overdue follow-ups): render per request
   const { leads, hasMore } = await listLeads({ division: division.db, stage: filter, q, page });
   const base = `/${division.slug}/crm`;
   const href = (next: { stage?: Filter; page?: number }) => {

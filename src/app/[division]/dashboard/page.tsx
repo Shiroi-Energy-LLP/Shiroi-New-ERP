@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { io } from "next/cache";
 import { FilePlus2, FolderPlus, IndianRupee, Plus, Receipt, ShoppingCart } from "lucide-react";
 import { parseDivision, type Division } from "@/lib/divisions";
 import { requireStaff } from "@/lib/auth/session";
@@ -106,6 +107,7 @@ async function CrmCards({ division }: { division: Division }) {
 
 async function DueFollowUps({ division }: { division: Division }) {
   await requireStaff();
+  await io(); // reads the current time (overdue / due today): render per request
   const items = await listDueFollowUps(division.db);
   if (items.length === 0) {
     return <Card className="p-6 text-center text-sm text-muted">No follow-ups due. 🎉</Card>;

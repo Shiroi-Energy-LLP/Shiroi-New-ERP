@@ -11,9 +11,8 @@ export function DeleteLeadButton({ action }: { action: () => Promise<ActionResul
     <div>
       <Button
         type="button"
-        variant="ghost"
+        variant="danger-ghost"
         size="sm"
-        className="text-danger"
         disabled={pending}
         onClick={() => {
           if (!window.confirm("Delete this lead and its timeline? This can't be undone.")) return;

@@ -86,35 +86,31 @@ async function LeadView({ divisionSlug, leadId }: { divisionSlug: string; leadId
         </div>
       </div>
 
+      {/* Phone: details → stage/schedule → timeline. Desktop: actions column on the right. */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <Card className="p-4 sm:p-6">
-            <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
-              <Info label="Phone" value={lead.phone} />
-              <Info label="Email" value={lead.email} />
-              <Info label="City" value={lead.city} />
-              <Info label="Load requirement" value={formatKw(lead.load_requirement_kw)} />
-              <Info label="Monthly EB bill" value={formatINR(lead.monthly_eb_bill)} />
-              <Info label="Roof type" value={lead.roof_type ? ROOF_LABELS[lead.roof_type] : null} />
-              <Info label="Source" value={SOURCE_LABELS[lead.source]} />
-              <Info label="Assigned to" value={lead.assigned?.full_name ?? "Unassigned"} />
-              <Info label="Created" value={`${formatDateIST(lead.created_at)}${lead.creator ? ` by ${lead.creator.full_name}` : ""}`} />
-              <Info label="Address" value={[lead.address, lead.pincode].filter(Boolean).join(" – ")} className="col-span-2 sm:col-span-3" />
-              {lead.notes ? <Info label="Notes" value={lead.notes} className="col-span-2 sm:col-span-3" /> : null}
-              {lead.stage === "lost" && lead.lost_reason ? (
-                <Info label="Lost reason" value={lead.lost_reason} className="col-span-2 sm:col-span-3" />
-              ) : null}
-            </dl>
-          </Card>
+        <div className="lg:col-span-2">
+            <Card className="p-4 sm:p-6">
+              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
+                <Info label="Phone" value={lead.phone} />
+                <Info label="Email" value={lead.email} />
+                <Info label="City" value={lead.city} />
+                <Info label="Load requirement" value={formatKw(lead.load_requirement_kw)} />
+                <Info label="Monthly EB bill" value={formatINR(lead.monthly_eb_bill)} />
+                <Info label="Roof type" value={lead.roof_type ? ROOF_LABELS[lead.roof_type] : null} />
+                <Info label="Source" value={SOURCE_LABELS[lead.source]} />
+                <Info label="Assigned to" value={lead.assigned?.full_name ?? "Unassigned"} />
+                <Info label="Created" value={`${formatDateIST(lead.created_at)}${lead.creator ? ` by ${lead.creator.full_name}` : ""}`} />
+                <Info label="Address" value={[lead.address, lead.pincode].filter(Boolean).join(" – ")} className="col-span-2 sm:col-span-3" />
+                {lead.notes ? <Info label="Notes" value={lead.notes} className="col-span-2 sm:col-span-3" /> : null}
+                {lead.stage === "lost" && lead.lost_reason ? (
+                  <Info label="Lost reason" value={lead.lost_reason} className="col-span-2 sm:col-span-3" />
+                ) : null}
+              </dl>
+            </Card>
 
-          <Card className="p-4 sm:p-6">
-            <h2 className="mb-3 text-sm font-semibold text-ink">Activity</h2>
-            <ActivityPanel action={addLeadActivity.bind(null, lead.id)} />
-            <Timeline activities={activities} />
-          </Card>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 lg:row-span-2">
           <StagePanel action={changeLeadStage.bind(null, lead.id)} stage={lead.stage} lostReason={lead.lost_reason} />
           <SchedulePanel
             action={scheduleLead.bind(null, lead.id)}
@@ -125,6 +121,14 @@ async function LeadView({ divisionSlug, leadId }: { divisionSlug: string; leadId
             Proposal and &ldquo;Convert to project&rdquo; arrive with the Sales module.
           </Card>
           {hasRole(user.role, CAN_DELETE_LEADS) ? <DeleteLeadButton action={deleteLead.bind(null, division.slug, lead.id)} /> : null}
+        </div>
+
+        <div className="lg:col-span-2">
+            <Card className="p-4 sm:p-6">
+              <h2 className="mb-3 text-sm font-semibold text-ink">Activity</h2>
+              <ActivityPanel action={addLeadActivity.bind(null, lead.id)} />
+              <Timeline activities={activities} />
+            </Card>
         </div>
       </div>
     </div>
